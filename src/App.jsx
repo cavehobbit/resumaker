@@ -1,122 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [events, setEvents] = useState([]);
+  const [form, setForm] = useState({ year: '', title: '', desc: '' });
+
+  //
+  useEffect(() => {
+    const saved = localStorage.getItem('STAMP_DATA');
+    if (saved) setEvents(JSON.parse(saved));
+  }, []);
+
+  const handleStamp = () => {
+    if (!form.year || !form.title) return alert("MISSING_DATA");
+    
+    const newEvents = [...events, { ...form, id: Date.now() }]
+      .sort((a, b) => parseInt(a.year) - parseInt(b.year));
+    
+    setEvents(newEvents);
+    localStorage.setItem('STAMP_DATA', JSON.stringify(newEvents));
+    setForm({ year: '', title: '', desc: '' });
+  };
+
+  const deleteOne = (id) => {
+    const filtered = events.filter(e => e.id !== id);
+    setEvents(filtered);
+    localStorage.setItem('STAMP_DATA', JSON.stringify(filtered));
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <section className="sidebar">
+        <h1>STAMP</h1>
+        
+        <div className="input-group">
+          <label>TIMESTAMP (YEAR)</label>
+          <input 
+            type="number" 
+            placeholder="E.G. 1994"
+            value={form.year}
+            onChange={e => setForm({...form, year: e.target.value})}
+          />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="input-group">
+          <label>EVENT_TITLE</label>
+          <input 
+            placeholder="E.G. GRADUATION"
+            value={form.title}
+            onChange={e => setForm({...form, title: e.target.value})}
+          />
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div className="input-group">
+          <label>DETAILS</label>
+          <textarea 
+            rows="4" 
+            placeholder="DESCRIBE_EVENT..."
+            value={form.desc}
+            onChange={e => setForm({...form, desc: e.target.value})}
+          ></textarea>
+        </div>
+
+        <button onClick={handleStamp}>STAMP_IT</button>
+        
+        <div style={{marginTop: 'auto'}}>
+          <button className="btn-sec" onClick={() => window.print()}>PRINT_PDF</button>
+          <button className="btn-sec" onClick={() => {
+            localStorage.clear();
+            setEvents([]);
+          }}>CLEAR_ALL</button>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <section className="view">
+        <div className="pipe"></div>
+        {events.map((ev) => (
+          <div className="card" key={ev.id}>
+            <div className="connector"></div>
+            <div className="card-year">{ev.year}</div>
+            <h2>{ev.title}</h2>
+            <p>{ev.desc}</p>
+            <button 
+              onClick={() => deleteOne(ev.id)}
+              style={{marginTop: '1rem', padding: '0.3rem', fontSize: '0.7rem', width: 'auto'}}
+            >
+              DELETE
+            </button>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
 }
-
-export default App
