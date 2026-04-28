@@ -4,6 +4,7 @@ import './App.css';
 export default function App() {
   const [events, setEvents] = useState([]);
   const [theme, setTheme] = useState('theme-professional');
+  const [fontSize, setFontSize] = useState('medium');
   const [customColors, setCustomColors] = useState({
     primary: '#4a5568',
     secondary: '#cbd5e0',
@@ -17,9 +18,11 @@ export default function App() {
     const saved = localStorage.getItem('RESUME_DATA');
     const savedTheme = localStorage.getItem('RESUME_THEME');
     const savedColors = localStorage.getItem('RESUME_COLORS');
+    const savedFontSize = localStorage.getItem('RESUME_FONTSIZE');
     if (saved) setEvents(JSON.parse(saved));
     if (savedTheme) setTheme(savedTheme);
     if (savedColors) setCustomColors(JSON.parse(savedColors));
+    if (savedFontSize) setFontSize(savedFontSize);
   }, []);
 
   const changeTheme = (t) => {
@@ -33,6 +36,11 @@ export default function App() {
     localStorage.setItem('RESUME_COLORS', JSON.stringify(newColors));
   };
 
+  const changeFontSize = (size) => {
+    setFontSize(size);
+    localStorage.setItem('RESUME_FONTSIZE', size);
+  };
+
   const handleStamp = () => {
     if (!form.year || !form.title) return;
     const newEvents = [...events, { ...form, id: Date.now() }]
@@ -42,15 +50,110 @@ export default function App() {
     setForm({ year: '', title: '', exp: '', edu: '', skills: '', sum: '' });
   };
 
+  const exportJSON = () => {
+    const dataStr = JSON.stringify(events, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'resume_data.json';
+    link.click();
+  };
+
+  const importJSON = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          setEvents(data);
+          localStorage.setItem('RESUME_DATA', JSON.stringify(data));
+        } catch (err) {
+          alert('INVALID_FILE_FORMAT');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const fontSizeMultiplier = fontSize === 'small' ? 0.85 : fontSize === 'large' ? 1.15 : 1;
+
   return (
     <div className="app" style={{
       '--custom-primary': customColors.primary,
       '--custom-secondary': customColors.secondary,
       '--custom-text': customColors.text
     }}>
+      <header className="taskbar">
+        <div className="taskbar-section">
+          <h1 className="taskbar-title">STAMP</h1>
+        </div>
+
+        <div className="taskbar-section">
+          <span className="taskbar-label">THEME:</span>
+          <select className="taskbar-dropdown" value={theme} onChange={(e) => changeTheme(e.target.value)}>
+            <option value="theme-professional">PROFESSIONAL</option>
+            <option value="theme-modern">MODERN</option>
+            <option value="theme-minimal">MINIMAL</option>
+            <option value="theme-classic">CLASSIC</option>
+            <option value="theme-floral">FLORAL</option>
+            <option value="theme-geometric">GEOMETRIC</option>
+            <option value="theme-dots">DOTS</option>
+          </select>
+        </div>
+
+        <div className="taskbar-section">
+          <span className="taskbar-label">SIZE:</span>
+          <select className="taskbar-dropdown" value={fontSize} onChange={(e) => changeFontSize(e.target.value)}>
+            <option value="small">SMALL</option>
+            <option value="medium">MEDIUM</option>
+            <option value="large">LARGE</option>
+          </select>
+        </div>
+
+        <div className="taskbar-section">
+          <span className="taskbar-label">COLORS:</span>
+          <div className="color-picker-group">
+            <input 
+              type="color" 
+              className="color-input"
+              title="PRIMARY"
+              value={customColors.primary} 
+              onChange={e => updateColor('primary', e.target.value)} 
+            />
+            <input 
+              type="color" 
+              className="color-input"
+              title="SECONDARY"
+              value={customColors.secondary} 
+              onChange={e => updateColor('secondary', e.target.value)} 
+            />
+            <input 
+              type="color" 
+              className="color-input"
+              title="TEXT"
+              value={customColors.text} 
+              onChange={e => updateColor('text', e.target.value)} 
+            />
+          </div>
+        </div>
+
+        <div className="taskbar-section">
+          <button className="taskbar-btn" onClick={exportJSON}>EXPORT_JSON</button>
+          <label className="taskbar-btn" style={{cursor: 'pointer'}}>
+            IMPORT_JSON
+            <input type="file" accept=".json" onChange={importJSON} style={{display: 'none'}} />
+          </label>
+          <button className="taskbar-btn" onClick={() => window.print()}>PRINT</button>
+        </div>
+      </header>
+
       <section className="sidebar">
+        
         <p className="picker-label">PRESET STYLES</p>
         <div className="style-picker">
+          
           <button className={`style-btn ${theme === 'theme-professional' ? 'active' : ''}`} onClick={() => changeTheme('theme-professional')}>PROFESSIONAL</button>
           <button className={`style-btn ${theme === 'theme-modern' ? 'active' : ''}`} onClick={() => changeTheme('theme-modern')}>MODERN</button>
           <button className={`style-btn ${theme === 'theme-minimal' ? 'active' : ''}`} onClick={() => changeTheme('theme-minimal')}>MINIMAL</button>
@@ -60,37 +163,7 @@ export default function App() {
           <button className={`style-btn ${theme === 'theme-dots' ? 'active' : ''}`} onClick={() => changeTheme('theme-dots')}>DOTS</button>
         </div>
 
-        <div className="section-divider"></div>
-
-        <p className="picker-label">CUSTOM COLORS</p>
-        <div className="color-grid">
-          <div className="input-group">
-            <label>PRIMARY</label>
-            <input 
-              type="color" 
-              value={customColors.primary} 
-              onChange={e => updateColor('primary', e.target.value)} 
-            />
-          </div>
-          <div className="input-group">
-            <label>SECONDARY</label>
-            <input 
-              type="color" 
-              value={customColors.secondary} 
-              onChange={e => updateColor('secondary', e.target.value)} 
-            />
-          </div>
-        </div>
-        <div className="input-group">
-          <label>TEXT COLOR</label>
-          <input 
-            type="color" 
-            value={customColors.text} 
-            onChange={e => updateColor('text', e.target.value)} 
-          />
-        </div>
-
-        <div className="section-divider"></div>
+        <div className ="section-divider"></div>
 
         <div className="input-group">
           <label>YEAR</label>
@@ -102,6 +175,7 @@ export default function App() {
           <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
         </div>
 
+
         <div className="input-group">
           <label>EXPERIENCE</label>
           <textarea rows="2" value={form.exp} onChange={e => setForm({...form, exp: e.target.value})} />
@@ -111,6 +185,7 @@ export default function App() {
           <label>EDUCATION</label>
           <textarea rows="2" value={form.edu} onChange={e => setForm({...form, edu: e.target.value})} />
         </div>
+
 
         <div className="input-group">
           <label>SKILLS</label>
@@ -122,10 +197,10 @@ export default function App() {
           <textarea rows="2" value={form.sum} onChange={e => setForm({...form, sum: e.target.value})} />
         </div>
 
+
         <button className="action-btn" onClick={handleStamp}>ADD ENTRY</button>
         
         <div style={{marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-          <button className="action-btn" onClick={() => window.print()}>PRINT</button>
           <button className="action-btn btn-secondary" onClick={() => {
             localStorage.removeItem('RESUME_DATA');
             setEvents([]);
@@ -133,9 +208,14 @@ export default function App() {
         </div>
       </section>
 
+
+
+
       <section className={`view ${theme}`}>
         {events.map((ev) => (
-          <div className="card" key={ev.id}>
+          <div className="card" key={ev.id} style={{
+            fontSize: `${fontSizeMultiplier}rem`
+          }}>
             <div className="card-header">
               <h2>{ev.title}</h2>
               <p className="card-year">{ev.year}</p>

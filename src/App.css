@@ -5,6 +5,7 @@
 :root {
   --thick: 4px;
   --shd: 8px 8px 0px 0px #000;
+  --pink: #FFB6C1;
 }
 
 body {
@@ -17,8 +18,81 @@ body {
 
 .app {
   display: grid;
+  grid-template-rows: 60px 1fr;
   grid-template-columns: 340px 1fr;
   height: 100vh;
+}
+/*newly added taskbar */
+.taskbar {
+  grid-column: 1 / -1;
+  background: var(--pink);
+  border-bottom: var(--thick) solid #000000;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.taskbar-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.taskbar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.taskbar-label {
+  font-size: 0.55rem;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-input {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #000000;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.taskbar-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.55rem;
+  cursor: pointer;
+  border: 2px solid #000000;
+  background: #000000;
+  color: #ffffff;
+  font-weight: bold;
+  transition: all 0.1s;
+}
+
+.taskbar-btn:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.taskbar-btn:active {
+  transform: translate(2px, 2px);
+}
+
+.taskbar-dropdown {
+  padding: 0.5rem;
+  font-size: 0.6rem;
+  border: 2px solid #000000;
+  background: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .sidebar {
@@ -27,11 +101,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  background: #ffb6c1;
+  background: var(--pink);
   z-index: 10;
   overflow-y: auto;
+  grid-row: 2;
+  grid-column: 1;
 }
-
 
 .section-divider {
   border-top: 2px solid #000000;
@@ -94,18 +169,6 @@ input, textarea {
   font-size: 0.75rem;
 }
 
-input[type="color"] {
-  height: 35px;
-  padding: 2px;
-  cursor: pointer;
-}
-
-.color-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
 .action-btn {
   width: 100%;
   padding: 0.7rem;
@@ -136,6 +199,8 @@ input[type="color"] {
   position: relative;
   background: #f5f5f5;
   gap: 3rem;
+  grid-row: 2;
+  grid-column: 2;
 }
 
 .card { 
@@ -171,6 +236,7 @@ input[type="color"] {
   background: #3498db; 
   color: #ffffff; 
 }
+/*modern theme colors *added more*/
 
 .theme-modern .card { 
   border: 4px solid #000000; 
@@ -227,12 +293,15 @@ input[type="color"] {
   border: 4px double #8b4513; 
   background: #faf0e6; 
   font-family: 'Merriweather', serif; 
+
 }
 .theme-classic .card-header { 
   background: #8b4513; 
   color: #faf0e6; 
   padding: 2rem; 
+
 }
+
 .theme-classic .card-body { 
   padding: 2rem; 
   background: #ffffff; 
@@ -262,7 +331,9 @@ input[type="color"] {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 20 Q30 30 30 50 Q30 70 50 80 Q70 70 70 50 Q70 30 50 20Z' fill='%23e0e0e0'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%23ffd700'/%3E%3C/svg%3E");
   background-size: contain;
   opacity: 0.3;
+
 }
+
 .theme-floral .card::after {
   content: '';
   position: absolute;
@@ -279,6 +350,7 @@ input[type="color"] {
   color: var(--custom-text, #ffffff); 
   padding: 2rem; 
   border-bottom: 3px solid var(--custom-secondary, #cbd5e0);
+
 }
 .theme-floral .card-body { 
   padding: 2rem; 
@@ -288,6 +360,7 @@ input[type="color"] {
   color: var(--custom-primary, #4a5568); 
   border-bottom: 2px solid var(--custom-secondary, #cbd5e0); 
 }
+
 .theme-floral .skill-tag { 
   background: var(--custom-secondary, #cbd5e0); 
   color: var(--custom-primary, #4a5568); 
@@ -298,7 +371,9 @@ input[type="color"] {
   background: #ffffff; 
   font-family: 'Space Mono', monospace;
   position: relative;
+
 }
+
 .theme-geometric .card::before {
   content: '';
   position: absolute;
@@ -327,14 +402,18 @@ input[type="color"] {
   );
   opacity: 0.2;
 }
+/*main added secs*/
+
 .theme-geometric .card-header { 
   background: var(--custom-primary, #000000); 
   color: var(--custom-text, #ffffff); 
   padding: 2rem; 
+
 }
 .theme-geometric .card-body { 
   padding: 2rem; 
   background: #ffffff; 
+
 }
 .theme-geometric .section-title { 
   color: var(--custom-primary, #000000); 
@@ -372,7 +451,6 @@ input[type="color"] {
   position: relative;
   z-index: 1;
 }
-
 .theme-dots .card-body { 
   padding: 2rem; 
   background: #ffffff; 
@@ -392,11 +470,13 @@ input[type="color"] {
 .card-header h2 { 
   font-size: 1.8rem; 
   margin-bottom: 0.3rem; 
+
 }
 .card-year { 
   font-size: 1rem; 
   opacity: 0.9; 
 }
+
 
 .card-body { 
   line-height: 1.8; 
@@ -414,12 +494,14 @@ input[type="color"] {
   text-transform: none; 
 }
 
+
 .skill-tags { 
   display: flex; 
   flex-wrap: wrap; 
   gap: 0.5rem; 
   margin-top: 0.6rem; 
 }
+
 .skill-tag { 
   padding: 0.4rem 0.8rem; 
   font-size: 0.75rem; 
@@ -440,6 +522,7 @@ input[type="color"] {
 
 @media print {
   body { background: white; }
+  .taskbar { display: none; }
   .sidebar { display: none; }
   .app { display: block; }
   .view { 
